@@ -6,6 +6,8 @@ import auth from '../../middlewares/auth';
 
 const router = express.Router();
 
+router.get('/', FacilityControllers.getAllFacilities);
+
 router.post(
   '/',
   auth('admin'),
@@ -19,5 +21,7 @@ router.put(
   validateRequest(FacilityValidations.updateFacilityValidationSchema),
   FacilityControllers.updateFacility,
 );
+
+router.delete('/:id', auth('admin'), FacilityControllers.deleteFacility);
 
 export const FacilityRoutes = router;
