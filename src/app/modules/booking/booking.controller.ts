@@ -5,10 +5,12 @@ import { BookingServices } from './booking.service';
 
 const createBooking = catchAsync(async (req, res) => {
   const bookingData = req.body;
+  const tokenData = req.headers.authorization as string;
 
-  //   console.log({userData});
-
-  const result = await BookingServices.createBookingIntoDB(bookingData);
+  const result = await BookingServices.createBookingIntoDB(
+    bookingData,
+    tokenData,
+  );
 
   sendResponse(res, {
     success: true,
