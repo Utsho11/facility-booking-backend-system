@@ -6,22 +6,15 @@ import { UserServices } from './user.service';
 const createUser = catchAsync(async (req, res) => {
   const userData = req.body;
 
-//   console.log({userData});
-  
+  //   console.log({userData});
 
   const result = await UserServices.createUserIntoDB(userData);
-  
-  const sanitizedResult = result.map(user => {
-    const { _id, password, ...rest } = user.toObject();
-    return { _id, ...rest };
-  });
-  
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: 'User registered successfully',
-    data: sanitizedResult,
+    data: result,
   });
 });
 
