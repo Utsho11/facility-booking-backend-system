@@ -27,6 +27,8 @@ const createFacilityIntoDB = async (payload: TFacility) => {
   }
 };
 
+
+
 export const FacilityServices = {
     createFacilityIntoDB,
 };
