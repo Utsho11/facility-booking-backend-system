@@ -25,9 +25,6 @@ const bookingSchema = new Schema<TBooking>(
       default: 'confirmed',
     },
   },
-  {
-    collection: 'Bookings',
-  },
 );
 
 export const Booking = model<TBooking>('Bookings', bookingSchema);

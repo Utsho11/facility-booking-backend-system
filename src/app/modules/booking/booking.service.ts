@@ -44,7 +44,7 @@ const createBookingIntoDB = async (payload: TBooking, tokenData: string) => {
     }
 
     // Calculate the duration in hours
-    const durationHours = (endDateTime - startDateTime)/60;
+    const durationHours = (endDateTime - startDateTime) / 60;
 
     const payableAmount = durationHours * facility.pricePerHour;
 
@@ -79,6 +79,10 @@ const createBookingIntoDB = async (payload: TBooking, tokenData: string) => {
   }
 };
 
+const getAllBookingsforAdminFromDB = async () => {
+  const result = await Booking.find().populate('facility').populate('user');
+  return result;
+};
 export const BookingServices = {
-  createBookingIntoDB,
+  createBookingIntoDB,getAllBookingsforAdminFromDB
 };

@@ -9,9 +9,6 @@ const facilitySchema = new Schema<TFacility>(
     location: { type: String, required: true },
     isDeleted: { type: Boolean, default: false },
   },
-  {
-    collection: 'Facilities',
-  },
 );
 
-export const Facility = model<TFacility>('Facilities', facilitySchema);
+export const Facility = model<TFacility>('Facility', facilitySchema);

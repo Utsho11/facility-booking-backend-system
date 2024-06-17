@@ -20,4 +20,15 @@ const createBooking = catchAsync(async (req, res) => {
   });
 });
 
-export const BookingControllers = { createBooking };
+const getAllBookingsforAdmin =  catchAsync(async (req, res) => {
+  const result = await BookingServices.getAllBookingsforAdminFromDB();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Bookings retrieved successfully',
+    data: result,
+  });
+});
+
+export const BookingControllers = { createBooking,getAllBookingsforAdmin };

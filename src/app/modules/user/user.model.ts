@@ -12,9 +12,6 @@ const userSchema = new Schema<TUser, UserModel>(
     role: { type: String, enum: ['admin', 'user'], required: true },
     address: { type: String, required: true },
   },
-  {
-    collection: 'Users',
-  },
 );
 
 userSchema.pre('save', async function (next) {
