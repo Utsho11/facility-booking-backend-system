@@ -15,7 +15,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "It's a backend based sport facility provider server which is connected to mongodb database. We can create user,create facilities and booking slot, update our data through this server.",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",

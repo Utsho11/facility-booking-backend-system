@@ -1,5 +1,4 @@
 import httpStatus from 'http-status';
-import config from '../../config';
 import AppError from '../../errors/AppError';
 import { TUser } from './user.interface';
 import mongoose from 'mongoose';

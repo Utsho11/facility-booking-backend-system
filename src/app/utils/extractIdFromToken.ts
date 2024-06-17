@@ -27,12 +27,11 @@ export const extractIdFromToken = async (tokenData: string) => {
     token,
     config.jwt_access_secret as string,
   ) as JwtPayload;
-  
-  const { role, userEmail, iat } = decoded;
+
+  const { userEmail } = decoded;
 
   // checking if the user is exist
-  const user = await User.findOne({email:userEmail});
-
+  const user = await User.findOne({ email: userEmail });
 
   return user?._id as mongoose.Types.ObjectId;
 };

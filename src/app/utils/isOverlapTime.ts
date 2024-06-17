@@ -19,7 +19,7 @@ export const isTimeOverlap = async (
   });
 
   const userStartTime = parseTime(startTime);
-  const userEndTime = parseTime(startTime);
+  const userEndTime = parseTime(endTime);
 
   for (const booking of similarDateandFacility) {
     const bookingStart = parseTime(booking.startTime);

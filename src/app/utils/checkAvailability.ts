@@ -28,10 +28,10 @@ const checkAvailability =  catchAsync(async (req, res) => {
         endTime: booking.endTime
       }));
   
-      let availableSlots: TimeSlot[] = [];
+      const availableSlots: TimeSlot[] = [];
   
       fullDay.forEach(slot => {
-        let { startTime, endTime } = slot;
+        const { startTime, endTime } = slot;
         bookedSlots.forEach(booked => {
           if (booked.startTime >= startTime && booked.startTime < endTime) {
             if (startTime < booked.startTime) {
