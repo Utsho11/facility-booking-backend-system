@@ -30,5 +30,31 @@ const getAllBookingsforAdmin =  catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getAllBookingsforUser =  catchAsync(async (req, res) => {
+  const tokenData = req.headers.authorization as string;
+  const result = await BookingServices.getAllBookingsforUserFromDB(tokenData);
 
-export const BookingControllers = { createBooking,getAllBookingsforAdmin };
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Bookings retrieved successfully',
+    data: result,
+  });
+});
+
+const deleteBooking = catchAsync(async (req, res) => {
+  const { id } = req.params;
+
+  const tokenData = req.headers.authorization as string;
+  const result = await BookingServices.deleteBookingFromDB(id,tokenData);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Booking cancelled successfully',
+    data: result,
+  });
+})
+
+export const BookingControllers = { createBooking,getAllBookingsforAdmin,getAllBookingsforUser,deleteBooking };

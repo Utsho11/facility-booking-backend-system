@@ -83,6 +83,59 @@ const getAllBookingsforAdminFromDB = async () => {
   const result = await Booking.find().populate('facility').populate('user');
   return result;
 };
+
+const getAllBookingsforUserFromDB = async (id: string) => {
+  const uid = await extractIdFromToken(id);
+
+  const result = await Booking.find({ user: uid }).populate('facility');
+  return result;
+};
+
+const deleteBookingFromDB = async (id: string, token: string) => {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const uid = await extractIdFromToken(token);
+    const booking = await Booking.findById(id);
+
+    
+
+    if (!booking?.user.equals(uid)) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'You are not allowed to delete this booking.',
+      );
+    }
+
+    const deletedBooking = await Booking.findByIdAndUpdate(
+      id,
+      { isBooked: 'canceled' },
+      { new: true, session },
+    );
+
+    if (!deletedBooking) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete booking');
+    }
+
+    // get user _id from deletedAdmin
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return deletedBooking.populate('facility');
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+};
+
+
 export const BookingServices = {
-  createBookingIntoDB,getAllBookingsforAdminFromDB
+  createBookingIntoDB,
+  getAllBookingsforAdminFromDB,
+  getAllBookingsforUserFromDB,
+  deleteBookingFromDB,
 };
