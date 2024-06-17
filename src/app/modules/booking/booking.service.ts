@@ -5,6 +5,7 @@ import httpStatus from 'http-status';
 import { Booking } from './booking.model';
 import { Facility } from '../facility/facility.model';
 import { extractIdFromToken } from '../../utils/extractIdFromToken';
+import { isTimeOverlap, parseTime } from '../../utils/isOverlapTime';
 
 const createBookingIntoDB = async (payload: TBooking, tokenData: string) => {
   const session = await mongoose.startSession();
@@ -17,28 +18,23 @@ const createBookingIntoDB = async (payload: TBooking, tokenData: string) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Facility does not exist!');
     }
 
-    // Parsing startTime and endTime as date objects
-    const date = new Date(payload.date);
-    const [startHour, startMinute] = payload.startTime.split(':').map(Number);
-    const [endHour, endMinute] = payload.endTime.split(':').map(Number);
+    const res = await isTimeOverlap(
+      payload.facility,
+      payload.date,
+      payload.startTime,
+      payload.endTime,
+    );
 
-    if (
-      isNaN(startHour) ||
-      isNaN(startMinute) ||
-      isNaN(endHour) ||
-      isNaN(endMinute)
-    ) {
+    if (res) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        'Invalid start time or end time provided.',
+        'This slot is already occupied!',
       );
     }
 
-    const startDateTime = new Date(date);
-    startDateTime.setHours(startHour, startMinute, 0, 0);
+    const startDateTime = parseTime(payload.startTime);
 
-    const endDateTime = new Date(date);
-    endDateTime.setHours(endHour, endMinute, 0, 0);
+    const endDateTime = parseTime(payload.endTime);
 
     if (endDateTime <= startDateTime) {
       throw new AppError(
@@ -48,8 +44,7 @@ const createBookingIntoDB = async (payload: TBooking, tokenData: string) => {
     }
 
     // Calculate the duration in hours
-    const durationHours =
-      (endDateTime.getTime() - startDateTime.getTime()) / (1000 * 60 * 60);
+    const durationHours = (endDateTime - startDateTime)/60;
 
     const payableAmount = durationHours * facility.pricePerHour;
 
