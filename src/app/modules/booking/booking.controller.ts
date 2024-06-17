@@ -30,6 +30,7 @@ const getAllBookingsforAdmin =  catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 const getAllBookingsforUser =  catchAsync(async (req, res) => {
   const tokenData = req.headers.authorization as string;
   const result = await BookingServices.getAllBookingsforUserFromDB(tokenData);

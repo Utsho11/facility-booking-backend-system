@@ -8,6 +8,7 @@ import express, { Application } from 'express';
 import globalErrorHandler from './app/middlewares/globalErrorhandler';
 import notFound from './app/middlewares/notFound';
 import router from './app/routes';
+import checkAvailability from './app/utils/checkAvailability';
 
 const app: Application = express();
 
@@ -19,6 +20,8 @@ app.use(cors({ origin: ['http://localhost:5173'] }));
 app.get("/", (req, res) => {
   res.send("Welcome to our facility-booking backend Server!!");
 });
+
+app.get("/api/check-availability", checkAvailability);
 
 app.use('/api', router);
 
