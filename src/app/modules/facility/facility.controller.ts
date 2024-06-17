@@ -24,7 +24,7 @@ const getAllFacilities = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Academic departments are retrieved successfully',
+    message: 'Facilities retrieved successfully',
     data: result,
   });
 });
