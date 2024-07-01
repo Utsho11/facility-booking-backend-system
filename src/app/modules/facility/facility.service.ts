@@ -5,26 +5,13 @@ import { TFacility } from './facility.interface';
 import { Facility } from './facility.model';
 
 const createFacilityIntoDB = async (payload: TFacility) => {
-  const session = await mongoose.startSession();
+  const newFacility = await Facility.create(payload);
 
-  try {
-    session.startTransaction();
-
-    const newFacility = await Facility.create([payload], { session });
-
-    if (!newFacility.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create student');
-    }
-
-    await session.commitTransaction();
-    await session.endSession();
-
-    return newFacility;
-  } catch (err: any) {
-    await session.abortTransaction();
-    await session.endSession();
-    throw new Error(err);
+  if (!newFacility) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create facility');
   }
+
+  return newFacility;
 };
 
 const getAllFacilitiesFromDB = async () => {
@@ -39,6 +26,11 @@ const updateFacilityIntoDB = async (
   const result = await Facility.findOneAndUpdate({ _id: id }, payload, {
     new: true,
   });
+
+  if (!result) {
+    return null;
+  }
+
   return result;
 };
 
@@ -55,7 +47,10 @@ const deleteFacilityFromDB = async (id: string) => {
     );
 
     if (!deletedFacility) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete student');
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'No Facility found with that ID!!',
+      );
     }
 
     // get user _id from deletedAdmin
@@ -64,10 +59,10 @@ const deleteFacilityFromDB = async (id: string) => {
     await session.endSession();
 
     return deletedFacility;
-  } catch (err: any) {
+  } catch (err) {
     await session.abortTransaction();
     await session.endSession();
-    throw new Error(err);
+    throw new Error(err as string);
   }
 };
 
@@ -75,5 +70,5 @@ export const FacilityServices = {
   createFacilityIntoDB,
   updateFacilityIntoDB,
   getAllFacilitiesFromDB,
-  deleteFacilityFromDB
+  deleteFacilityFromDB,
 };

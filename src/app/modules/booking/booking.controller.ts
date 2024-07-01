@@ -20,7 +20,7 @@ const createBooking = catchAsync(async (req, res) => {
   });
 });
 
-const getAllBookingsforAdmin =  catchAsync(async (req, res) => {
+const getAllBookingsforAdmin = catchAsync(async (req, res) => {
   const result = await BookingServices.getAllBookingsforAdminFromDB();
 
   sendResponse(res, {
@@ -31,10 +31,9 @@ const getAllBookingsforAdmin =  catchAsync(async (req, res) => {
   });
 });
 
-const getAllBookingsforUser =  catchAsync(async (req, res) => {
+const getAllBookingsforUser = catchAsync(async (req, res) => {
   const tokenData = req.headers.authorization as string;
   const result = await BookingServices.getAllBookingsforUserFromDB(tokenData);
-
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -48,7 +47,7 @@ const deleteBooking = catchAsync(async (req, res) => {
   const { id } = req.params;
 
   const tokenData = req.headers.authorization as string;
-  const result = await BookingServices.deleteBookingFromDB(id,tokenData);
+  const result = await BookingServices.deleteBookingFromDB(id, tokenData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -56,6 +55,11 @@ const deleteBooking = catchAsync(async (req, res) => {
     message: 'Booking cancelled successfully',
     data: result,
   });
-})
+});
 
-export const BookingControllers = { createBooking,getAllBookingsforAdmin,getAllBookingsforUser,deleteBooking };
+export const BookingControllers = {
+  createBooking,
+  getAllBookingsforAdmin,
+  getAllBookingsforUser,
+  deleteBooking,
+};

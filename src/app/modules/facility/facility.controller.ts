@@ -33,6 +33,15 @@ const updateFacility = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await FacilityServices.updateFacilityIntoDB(id, req.body);
 
+  if (!result) {
+    return sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.NOT_FOUND,
+      message: 'No facility is found with that ID!!',
+      data: null,
+    });
+  }
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -44,6 +53,15 @@ const updateFacility = catchAsync(async (req, res) => {
 const deleteFacility = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await FacilityServices.deleteFacilityFromDB(id);
+
+  if (!result) {
+    return sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.NOT_FOUND,
+      message: 'No facility is found with that ID!!',
+      data: null,
+    });
+  }
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -57,5 +75,5 @@ export const FacilityControllers = {
   createFacility,
   updateFacility,
   getAllFacilities,
-  deleteFacility
+  deleteFacility,
 };

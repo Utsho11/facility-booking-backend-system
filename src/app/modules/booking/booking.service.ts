@@ -8,75 +8,64 @@ import { extractIdFromToken } from '../../utils/extractIdFromToken';
 import { isTimeOverlap, parseTime } from '../../utils/isOverlapTime';
 
 const createBookingIntoDB = async (payload: TBooking, tokenData: string) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  const facility = await Facility.findOne({
+    _id: payload.facility,
+    isDeleted: false,
+  });
 
-  try {
-    const facility = await Facility.findById(payload.facility).session(session);
-
-    if (!facility) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Facility does not exist!');
-    }
-
-    const res = await isTimeOverlap(
-      payload.facility,
-      payload.date,
-      payload.startTime,
-      payload.endTime,
-    );
-
-    if (res) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        'This slot is already occupied!',
-      );
-    }
-
-    const startDateTime = parseTime(payload.startTime);
-
-    const endDateTime = parseTime(payload.endTime);
-
-    if (endDateTime <= startDateTime) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        'End time must be after start time.',
-      );
-    }
-
-    // Calculate the duration in hours
-    const durationHours = (endDateTime - startDateTime) / 60;
-
-    const payableAmount = durationHours * facility.pricePerHour;
-
-    if (isNaN(payableAmount)) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        'Calculated payable amount is not a valid number.',
-      );
-    }
-
-    const uid = await extractIdFromToken(tokenData);
-
-    payload.payableAmount = payableAmount;
-    payload.user = new mongoose.Types.ObjectId(uid); // Ensure the ID is of ObjectId type
-
-    const newBooking = await Booking.create([payload], { session });
-
-    if (!newBooking.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create booking.');
-    }
-
-    await session.commitTransaction();
-    return newBooking;
-  } catch (err: any) {
-    await session.abortTransaction();
-    throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      err.message || 'An error occurred during the booking creation process.',
-    );
-  } finally {
-    session.endSession();
+  if (!facility) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Facility does not exist!');
   }
+
+  const res = await isTimeOverlap(
+    payload.facility,
+    payload.date,
+    payload.startTime,
+    payload.endTime,
+  );
+
+  if (res) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'This slot is already occupied!',
+    );
+  }
+
+  const startDateTime = parseTime(payload.startTime);
+
+  const endDateTime = parseTime(payload.endTime);
+
+  if (endDateTime <= startDateTime) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'End time must be after start time.',
+    );
+  }
+
+  // Calculate the duration in hours
+  const durationHours = (endDateTime - startDateTime) / 60;
+
+  const payableAmount = durationHours * facility.pricePerHour;
+
+  if (isNaN(payableAmount)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Calculated payable amount is not a valid number.',
+    );
+  }
+
+  const uid = await extractIdFromToken(tokenData);
+
+  payload.payableAmount = payableAmount;
+  payload.user = new mongoose.Types.ObjectId(uid); // Ensure the ID is of ObjectId type
+
+  const newBooking = await Booking.create(payload);
+
+  if (!newBooking) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create booking.');
+  }
+
+  return newBooking;
 };
 
 const getAllBookingsforAdminFromDB = async () => {
@@ -99,8 +88,6 @@ const deleteBookingFromDB = async (id: string, token: string) => {
 
     const uid = await extractIdFromToken(token);
     const booking = await Booking.findById(id);
-
-    
 
     if (!booking?.user.equals(uid)) {
       throw new AppError(
@@ -125,13 +112,12 @@ const deleteBookingFromDB = async (id: string, token: string) => {
     await session.endSession();
 
     return deletedBooking.populate('facility');
-  } catch (err: any) {
+  } catch (err) {
     await session.abortTransaction();
     await session.endSession();
-    throw new Error(err);
+    throw new Error(err as string);
   }
 };
-
 
 export const BookingServices = {
   createBookingIntoDB,

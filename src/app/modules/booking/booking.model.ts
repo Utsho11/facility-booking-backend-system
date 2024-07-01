@@ -25,6 +25,22 @@ const bookingSchema = new Schema<TBooking>(
       default: 'confirmed',
     },
   },
+  {
+    toJSON: {
+      transform: function (doc, ret) {
+        return {
+          _id: ret._id,
+          facility: ret.facility,
+          date: ret.date,
+          startTime: ret.startTime,
+          endTime: ret.endTime,
+          user: ret.user,
+          payableAmount: ret.payableAmount,
+          isBooked: ret.isBooked,
+        };
+      },
+    },
+  },
 );
 
 export const Booking = model<TBooking>('Bookings', bookingSchema);

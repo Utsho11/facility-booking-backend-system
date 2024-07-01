@@ -12,6 +12,20 @@ const userSchema = new Schema<TUser, UserModel>(
     role: { type: String, enum: ['admin', 'user'], required: true },
     address: { type: String, required: true },
   },
+  {
+    toJSON: {
+      transform: function (doc, ret) {
+        return {
+          _id: ret._id,
+          name: ret.name,
+          email: ret.email,
+          phone: ret.phone,
+          role: ret.role,
+          address: ret.address,
+        };
+      },
+    },
+  },
 );
 
 userSchema.pre('save', async function (next) {
@@ -36,12 +50,6 @@ userSchema.statics.isPasswordMatched = async function (
   hashedPassword,
 ) {
   return await bcrypt.compare(plainTextPassword, hashedPassword);
-};
-
-userSchema.methods.toJSON = function () {
-  const obj = this.toObject();
-  delete obj.password;
-  return obj;
 };
 
 export const User = model<TUser, UserModel>('User', userSchema);
