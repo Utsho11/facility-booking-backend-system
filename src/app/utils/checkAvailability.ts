@@ -9,14 +9,22 @@ interface TimeSlot {
 }
 
 const checkAvailability = catchAsync(async (req, res) => {
-  const dateQuery = req.query?.date as string;
+  // console.log(req.query);
+
+  const dateQuery = req?.query?.date as string;
+  const facilityQuery = req?.query?.facility;
   const date = dateQuery ? new Date(dateQuery) : new Date();
   const formattedDate = date.toISOString().split('T')[0];
 
   // Retrieve bookings for the specified date and sort by start time in ascending order
-  const bookings = await Booking.find({ date: formattedDate })
+  const bookings = await Booking.find({
+    date: formattedDate,
+    facility: facilityQuery,
+  })
     .sort('startTime')
     .sort('endTime');
+
+  // console.log(bookings);
 
   // Function to convert time string to minutes
   const timeToMinutes = (time: string): number => {
