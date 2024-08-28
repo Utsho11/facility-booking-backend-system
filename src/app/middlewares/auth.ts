@@ -16,7 +16,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
     if (tokenData && tokenData.startsWith('Bearer ')) {
       token = tokenData.split(' ')[1];
     } else {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Token is not in a valid format.');
+      token = tokenData;
     }
 
     // checking if the token is missing

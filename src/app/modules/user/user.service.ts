@@ -13,6 +13,13 @@ const createUserIntoDB = async (payload: TUser) => {
   return newStudent;
 };
 
+const getMeFromDb = async (email: string) => {
+  const result = await User.findOne({ email: email });
+
+  return result;
+};
+
 export const UserServices = {
   createUserIntoDB,
+  getMeFromDb,
 };

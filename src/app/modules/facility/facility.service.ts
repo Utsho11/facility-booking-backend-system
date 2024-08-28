@@ -3,6 +3,7 @@ import AppError from '../../errors/AppError';
 import mongoose from 'mongoose';
 import { TFacility } from './facility.interface';
 import { Facility } from './facility.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createFacilityIntoDB = async (payload: TFacility) => {
   const newFacility = await Facility.create(payload);
@@ -14,8 +15,27 @@ const createFacilityIntoDB = async (payload: TFacility) => {
   return newFacility;
 };
 
-const getAllFacilitiesFromDB = async () => {
-  const result = await Facility.find();
+const getAllFacilitiesFromDB = async (query: Record<string, unknown>) => {
+  const facilityQuery = new QueryBuilder(Facility.find(), query)
+    .search(['name', 'location'])
+    .filter()
+    .sort()
+    .paginate();
+
+  const result = await facilityQuery.modelQuery;
+  const meta = await facilityQuery.countTotal();
+
+  // const result = await Facility.find();
+  return { result, meta };
+};
+
+const getSingleFacilityFromDB = async (id: string) => {
+  const result = await Facility.findById(id);
+
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No Facility found with that ID');
+  }
+
   return result;
 };
 
@@ -71,4 +91,5 @@ export const FacilityServices = {
   updateFacilityIntoDB,
   getAllFacilitiesFromDB,
   deleteFacilityFromDB,
+  getSingleFacilityFromDB,
 };

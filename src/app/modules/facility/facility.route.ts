@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.get('/', FacilityControllers.getAllFacilities);
 
+router.get('/:id', FacilityControllers.getSingleFacility);
 router.post(
   '/',
   auth('admin'),

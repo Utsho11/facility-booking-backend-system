@@ -19,12 +19,25 @@ const createFacility = catchAsync(async (req, res) => {
 });
 
 const getAllFacilities = catchAsync(async (req, res) => {
-  const result = await FacilityServices.getAllFacilitiesFromDB();
+  const result = await FacilityServices.getAllFacilitiesFromDB(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Facilities retrieved successfully',
+    data: result,
+  });
+});
+
+const getSingleFacility = catchAsync(async (req, res) => {
+  const { id } = req.params;
+
+  const result = await FacilityServices.getSingleFacilityFromDB(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Academic semester is retrieved succesfully',
     data: result,
   });
 });
@@ -75,5 +88,6 @@ export const FacilityControllers = {
   createFacility,
   updateFacility,
   getAllFacilities,
+  getSingleFacility,
   deleteFacility,
 };
