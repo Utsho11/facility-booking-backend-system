@@ -43,6 +43,20 @@ const getAllBookingsforUser = catchAsync(async (req, res) => {
   });
 });
 
+const getSingleBooking = catchAsync(async (req, res) => {
+  const { id } = req.params;
+
+  const result = await BookingServices.getSingleBookingFromDB(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Academic semester is retrieved succesfully',
+
+    data: result,
+  });
+});
+
 const deleteBooking = catchAsync(async (req, res) => {
   const { id } = req.params;
 
@@ -61,5 +75,6 @@ export const BookingControllers = {
   createBooking,
   getAllBookingsforAdmin,
   getAllBookingsforUser,
+  getSingleBooking,
   deleteBooking,
 };

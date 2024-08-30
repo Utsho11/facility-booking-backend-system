@@ -114,6 +114,16 @@ const getAllBookingsforUserFromDB = async (id: string) => {
   return result;
 };
 
+const getSingleBookingFromDB = async (id: string) => {
+  const result = await Booking.findById(id).populate('facility');
+
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No Facility found with that ID');
+  }
+
+  return result;
+};
+
 const deleteBookingFromDB = async (id: string, token: string) => {
   const session = await mongoose.startSession();
 
@@ -157,5 +167,6 @@ export const BookingServices = {
   createBookingIntoDB,
   getAllBookingsforAdminFromDB,
   getAllBookingsforUserFromDB,
+  getSingleBookingFromDB,
   deleteBookingFromDB,
 };
