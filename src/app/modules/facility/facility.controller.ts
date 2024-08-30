@@ -25,7 +25,8 @@ const getAllFacilities = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Facilities retrieved successfully',
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 
@@ -38,6 +39,7 @@ const getSingleFacility = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Academic semester is retrieved succesfully',
+
     data: result,
   });
 });
@@ -65,6 +67,7 @@ const updateFacility = catchAsync(async (req, res) => {
 
 const deleteFacility = catchAsync(async (req, res) => {
   const { id } = req.params;
+
   const result = await FacilityServices.deleteFacilityFromDB(id);
 
   if (!result) {

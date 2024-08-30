@@ -6,6 +6,8 @@ export interface TBooking {
   startTime: string;
   endTime: string;
   user: Types.ObjectId;
+  transactionId?: string;
   payableAmount: number;
+  paymentStatus: 'paid' | 'pending';
   isBooked: 'confirmed' | 'unconfirmed' | 'canceled';
 }

@@ -6,6 +6,9 @@ import { Booking } from './booking.model';
 import { Facility } from '../facility/facility.model';
 import { extractIdFromToken } from '../../utils/extractIdFromToken';
 import { isTimeOverlap, parseTime } from '../../utils/isOverlapTime';
+import { initiatePayment } from '../payment/payment.utils';
+import { User } from '../user/user.model';
+import { TCustomerDetails } from '../payment/payment.interface';
 
 const createBookingIntoDB = async (payload: TBooking, tokenData: string) => {
   const facility = await Facility.findOne({
@@ -15,6 +18,18 @@ const createBookingIntoDB = async (payload: TBooking, tokenData: string) => {
 
   if (!facility) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Facility does not exist!');
+  }
+
+  const bookingDate = new Date(payload.date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Reset time to midnight for comparison
+
+  // Check if the booking date is in the past
+  if (bookingDate < today) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Booking date cannot be in the past.',
+    );
   }
 
   const res = await isTimeOverlap(
@@ -57,7 +72,24 @@ const createBookingIntoDB = async (payload: TBooking, tokenData: string) => {
   const uid = await extractIdFromToken(tokenData);
 
   payload.payableAmount = payableAmount;
-  payload.user = new mongoose.Types.ObjectId(uid); // Ensure the ID is of ObjectId type
+  payload.user = new mongoose.Types.ObjectId(uid);
+
+  const userDetails = await User.findById(uid);
+
+  const transactionId = `TXN-${Date.now()}`;
+
+  payload.transactionId = transactionId;
+
+  const paymentData = {
+    cus_name: userDetails?.name,
+    cus_email: userDetails?.email,
+    cus_phone: userDetails?.phone,
+    cus_address: userDetails?.address,
+    amount: payload.payableAmount,
+    tranId: transactionId,
+  };
+
+  const paymentSession = await initiatePayment(paymentData as TCustomerDetails);
 
   const newBooking = await Booking.create(payload);
 
@@ -65,7 +97,7 @@ const createBookingIntoDB = async (payload: TBooking, tokenData: string) => {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create booking.');
   }
 
-  return newBooking;
+  return paymentSession;
 };
 
 const getAllBookingsforAdminFromDB = async () => {
@@ -76,7 +108,9 @@ const getAllBookingsforAdminFromDB = async () => {
 const getAllBookingsforUserFromDB = async (id: string) => {
   const uid = await extractIdFromToken(id);
 
-  const result = await Booking.find({ user: uid }).populate('facility');
+  const result = await Booking.find({ user: uid })
+    .populate('facility')
+    .populate('user');
   return result;
 };
 

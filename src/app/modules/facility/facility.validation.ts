@@ -14,15 +14,21 @@ const createFacilityValidationSchema = z.object({
 const updateFacilityValidationSchema = z.object({
   body: z.object({
     name: z.string().min(1, { message: 'Name is required' }).optional(),
-    description: z.string().min(1, { message: 'Description is required' }).optional(),
+    description: z
+      .string()
+      .min(1, { message: 'Description is required' })
+      .optional(),
     pricePerHour: z
       .number()
-      .nonnegative({ message: 'Price per hour must be a positive number' }).optional(),
+      .nonnegative({ message: 'Price per hour must be a positive number' })
+      .optional(),
     location: z.string().min(1, { message: 'Location is required' }).optional(),
+    image: z.string().min(1, { message: 'Image is required' }).optional(),
     isDeleted: z.boolean().optional().default(false).optional(),
   }),
 });
 
 export const FacilityValidations = {
-  createFacilityValidationSchema,updateFacilityValidationSchema
+  createFacilityValidationSchema,
+  updateFacilityValidationSchema,
 };
