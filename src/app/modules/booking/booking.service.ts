@@ -118,7 +118,7 @@ const getSingleBookingFromDB = async (id: string) => {
   const result = await Booking.findById(id).populate('facility');
 
   if (!result) {
-    throw new AppError(httpStatus.NOT_FOUND, 'No Facility found with that ID');
+    throw new AppError(httpStatus.NOT_FOUND, 'No Booking found with that ID');
   }
 
   return result;
@@ -149,8 +149,6 @@ const deleteBookingFromDB = async (id: string, token: string) => {
     if (!deletedBooking) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete booking');
     }
-
-    // get user _id from deletedAdmin
 
     await session.commitTransaction();
     await session.endSession();

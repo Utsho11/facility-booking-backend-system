@@ -1,7 +1,7 @@
 {
-  "name": "assignment-3",
+  "name": "facility-booking-backend-system",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/server.js",
   "scripts": {
     "start:prod": "node ./dist/server.js",
     "start:dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
@@ -10,37 +10,47 @@
     "lint:fix": "npx eslint src --fix",
     "prettier": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",
     "prettier:fix": "npx prettier --write src",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "facility-booking",
+    "court-booking",
+    "express",
+    "typescript",
+    "mongodb",
+    "shurjopay",
+    "aamarpay"
+  ],
+  "author": "Utsho",
   "license": "ISC",
-  "description": "It's a backend based sport facility provider server which is connected to mongodb database. We can create user,create facilities and booking slot, update our data through this server.",
+  "description": "Production-grade backend system for sports facility and court booking management with role-based access control, time overlap prevention, and multi-gateway payment processing.",
   "dependencies": {
-    "axios": "^1.7.5",
+    "axios": "^1.8.1",
     "bcrypt": "^5.1.1",
-    "cookie-parser": "^1.4.6",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "http-status": "^1.7.4",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.4.1",
+    "mongoose": "^8.10.1",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.4.5",
-    "zod": "^3.23.8"
+    "typescript": "^5.7.3",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.5.0",
+    "@eslint/js": "^9.20.0",
     "@types/bcrypt": "^5.0.2",
-    "@types/cookie-parser": "^1.4.7",
+    "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
-    "@types/jsonwebtoken": "^9.0.6",
-    "@typescript-eslint/eslint-plugin": "^7.13.0",
-    "@typescript-eslint/parser": "^7.13.0",
-    "eslint": "^8.57.0",
-    "globals": "^15.4.0",
-    "prettier": "^3.3.2",
-    "typescript-eslint": "^7.13.0"
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.8",
+    "@types/node": "^22.13.4",
+    "@typescript-eslint/eslint-plugin": "^8.24.0",
+    "@typescript-eslint/parser": "^8.24.0",
+    "eslint": "^9.20.0",
+    "globals": "^15.15.0",
+    "prettier": "^3.5.1",
+    "typescript-eslint": "^8.24.0"
   }
 }

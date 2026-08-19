@@ -15,7 +15,7 @@ export const isTimeOverlap = async (
   const similarDateandFacility = await Booking.find({
     facility: facilityId,
     date: date,
-    isBooked: 'confirmed',
+    isBooked: { $ne: 'canceled' },
   });
 
   const userStartTime = parseTime(startTime);
@@ -25,13 +25,8 @@ export const isTimeOverlap = async (
     const bookingStart = parseTime(booking.startTime);
     const bookingEnd = parseTime(booking.endTime);
 
-    // console.log(bookingStart < userStartTime && bookingEnd > userStartTime);
-    // console.log(bookingStart < userEndTime && bookingEnd > userEndTime);
-
-    if (
-      (bookingStart <= userStartTime && bookingEnd > userStartTime) ||
-      (bookingStart < userEndTime && bookingEnd > userEndTime)
-    ) {
+    // Standard interval overlap condition: A.start < B.end && A.end > B.start
+    if (userStartTime < bookingEnd && userEndTime > bookingStart) {
       return true;
     }
   }

@@ -11,12 +11,23 @@ import router from './app/routes';
 import { BookingControllers } from './app/modules/booking/booking.controller';
 import checkAvailability from './app/utils/checkAvailability';
 
+import config from './app/config';
+
 const app: Application = express();
 
 //parsers
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+app.use(
+  cors({
+    origin: [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      config.client_base_url as string,
+    ].filter(Boolean),
+    credentials: true,
+  }),
+);
 
 app.get('/', (req, res) => {
   res.send('Welcome to our facility-booking backend Server!!');

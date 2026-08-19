@@ -1,119 +1,134 @@
+# 🏟️ Facility & Court Booking System - Backend API
 
-# Sport Facility Booking System Server
+[![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.21.2-lightgrey.svg)](https://expressjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose%208-green.svg)](https://mongoosejs.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
-It's a backend based sport facility provider server which is connected to mongodb database. We can create user,create facilities and booking slot, update our data through this server.
+A production-grade REST API backend for a sports facility and court booking management system. Features modular architecture, strictly typed schemas, automated slot interval overlap prevention, multi-gateway payment processing, and role-based access control.
 
-## Project Name:
+---
 
-Sport Facility Booking System
+## 🏗️ System Architecture & Workflow
 
-## Live URL:
-
-- [Sport Facility Booking API](https://sport-facility-booking-backend-server.vercel.app/)
-
-## Features:
-
-- **Login/ Signup.**
-
-- **Create User.** (admin/user)
-
-- **Authentication System.**
-
-- **Authorization System.**
-
-- **Create Facilities.** (only admin)
-
-- **Delete Facility.** (only admin)
-
-- **Update Facility.** (only admin)
-
-- **Create Booking.** (only user)
-
-- **Delete Booking.** (only user)
-
-- **Check Availability of free slots.**
-
-
-## Technology Used
-
-- **bcrypt**: A library to help hash passwords, ensuring secure storage of user passwords in databases.
-
-- **cookie-parser**: Middleware for handling cookies in Express.js applications, allowing easy parsing and manipulation of cookies.
-
-- **cors**: Middleware for enabling Cross-Origin Resource Sharing (CORS) in Express.js, allowing your server to accept requests from different origins.
-
-- **dotenv**: A module that loads environment variables from a `.env` file into `process.env`, facilitating the configuration of environment-specific variables.
-
-- **express**: A fast, unopinionated, minimalist web framework for Node.js, used for building web applications and APIs.
-
-- **http-status**: A utility to interact with HTTP status codes, providing constants and descriptions for standard HTTP status codes.
-
-- **jsonwebtoken**: A library to create, sign, and verify JSON Web Tokens (JWTs), commonly used for authentication in web applications.
-
-- **mongoose**: An Object Data Modeling (ODM) library for MongoDB and Node.js, providing a schema-based solution to model your application data.
-
-- **ts-node-dev**: A development tool that combines `ts-node` with `nodemon`, enabling automatic restarts and TypeScript compilation for faster development cycles.
-
-- **typescript**: A strongly typed programming language that builds on JavaScript, adding static type definitions to help catch errors early in the development process.
-
-- **zod**: A TypeScript-first schema declaration and validation library, used to validate data and ensure type safety.
-
-- **MongoDB**: NoSQL database.
-
-## Installation
-
-To set up the project locally, follow these steps:
-
-**1. Clone the repository**:
-
-```bash
-    git clone https://github.com/Utsho11/facility-booking-backend-system.git
-```
-
-**2. Go to the project directory:**
-
-Please change my-project with the main directory here. 
-
-```bash
-    cd my-project
-```
- 
-
-**3. Install dependencies**:
-
-Open your terminal and run these commands to set npm.
-
-```bash
-    1. npm init -y
+```mermaid
+flowchart TD
+    Client([Client App / Frontend]) -->|Bearer JWT| Gateway[Express App & Middlewares]
     
-    2. npm install
+    Gateway --> AuthMW[Auth & RBAC Middleware]
+    Gateway --> ZodMW[Zod Schema Validation]
+    
+    AuthMW --> AuthModule[Auth Module]
+    AuthMW --> FacilityModule[Facility Module]
+    AuthMW --> BookingModule[Booking & Overlap Engine]
+    AuthMW --> PaymentModule[Payment Module]
+    AuthMW --> ReviewModule[Review & Rating Module]
+    
+    BookingModule -->|Interval Overlap Check| MongoDB[(MongoDB Database)]
+    PaymentModule -->|Payment Gateway API| ExtPayment[Shurjopay / Aamarpay]
+    ExtPayment -->|Redirect / Webhook| PaymentModule
 ```
 
-**4. Set up environment variables**:
+---
 
-Create a `.env` file in the root of the project and add the following variables:
+## 🌟 Key Engineering Features
 
-`NODE_ENV`
+- **🛡️ Flawless Interval Overlap Prevention:** mathematically proven boundary algorithm (`startA < endB && endA > startB`) preventing double-booking across partial, identical, or encompassing reservations.
+- **🔐 Robust Auth & RBAC:** Dual-token rotation system (short-lived access tokens + secure refresh tokens) with guarded `isModified('password')` pre-save hooks.
+- **💳 Multi-Gateway Payment Lifecycle:** Seamless initiation, webhook callback verification, automatic transaction recording, and receipt status generation.
+- **⭐ Community Reviews & Ratings:** Aggregate rating calculations and verified feedback endpoints.
+- **🔍 Advanced Query Builder:** Dynamic search, multi-field filtering, price sorting, and cursor-friendly pagination.
+- **🐳 Containerized & Cloud-Ready:** Multi-stage Dockerfile and Docker Compose orchestration.
+- **🧪 Unit Tested:** Comprehensive Jest suite validating interval intersection edge cases.
 
-`PORT`
+---
 
-`DATABASE_URL`
+## 📋 API Endpoints
 
-`BCRYPT_SALT_ROUNDS`
+### 🔐 Authentication (`/api/auth`)
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/signup` | Public | Register a new user |
+| `POST` | `/api/auth/login` | Public | Login & receive access/refresh tokens |
+| `POST` | `/api/auth/refresh-token` | Public | Generate new access token via refresh token |
 
-`DEFAULT_PASS`
+### 🏟️ Facilities (`/api/facility`)
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/facility` | Admin | Create a new sports facility |
+| `GET` | `/api/facility` | Public | Get all facilities (search, filter, sort, paginate) |
+| `GET` | `/api/facility/:id` | Public | Get single facility details |
+| `PUT` | `/api/facility/:id` | Admin | Update facility information |
+| `DELETE`| `/api/facility/:id` | Admin | Soft-delete a facility |
 
-`JWT_ACCESS_SECRET`
+### 📅 Bookings & Availability (`/api/bookings` & `/api/check-availability`)
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/check-availability` | Public | Query non-conflicting available slot windows |
+| `POST` | `/api/bookings` | User | Create a booking & initiate payment session |
+| `GET` | `/api/bookings` | Admin | View all system-wide bookings |
+| `GET` | `/api/bookings/user` | User | View logged-in user's bookings |
+| `DELETE`| `/api/bookings/:id` | User | Cancel an existing booking |
 
-`JWT_REFRESH_SECRET`
+### 💳 Payments (`/api/payment`)
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST/GET`| `/api/payment/confirmation`| Public | Payment gateway verification callback |
+| `GET` | `/api/payment/verify/:transactionId` | Public | Retrieve verified booking transaction receipt |
 
-`JWT_ACCESS_EXPIRES_IN`
+### ⭐ Reviews (`/api/reviews`)
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/reviews` | User | Post a rating and review comment |
+| `GET` | `/api/reviews/:facilityId` | Public | Fetch facility reviews & average rating |
 
-`JWT_REFRESH_EXPIRES_IN`
+---
 
+## ⚙️ Environment Variables
 
-**5. Run the application**:
+Create a `.env` file in the root directory:
 
+```env
+NODE_ENV=development
+PORT=5000
+DATABASE_URL=mongodb://localhost:27017/facility-booking
+BCRYPT_SALT_ROUNDS=12
+JWT_ACCESS_SECRET=your_jwt_access_secret
+JWT_REFRESH_SECRET=your_jwt_refresh_secret
+JWT_ACCESS_EXPIRES_IN=1d
+JWT_REFRESH_EXPIRES_IN=30d
+BACKEND_BASE_URL=http://localhost:5000
+CLIENT_BASE_URL=http://localhost:5173
+
+# Payment Gateway Credentials
+STORE_ID=your_store_id
+SIGNATURE_KEY=your_signature_key
+PAYMENT_URL=https://sandbox.aamarpay.com/jsonpost.php
+VERIFY_PAYMENT_URL=https://sandbox.aamarpay.com/api/v1/trxcheck/request.php
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Local Setup
 ```bash
-    npm run start:dev
+# Install dependencies
+npm install
+
+# Run in development mode
+npm run start:dev
+
+# Build TypeScript
+npm run build
+
+# Run Unit Tests
+npm test
+```
+
+### 2. Docker Setup
+```bash
+# Build and run with Docker Compose
+docker-compose up -d --build
 ```

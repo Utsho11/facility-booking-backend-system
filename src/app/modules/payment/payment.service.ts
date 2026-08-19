@@ -1,33 +1,43 @@
+import config from '../../config';
 import { Booking } from '../booking/booking.model';
 import { verifyPayment } from './payment.utils';
-import { join } from 'path';
-import { readFileSync } from 'fs';
 
-const controllerService = async (transactionId: string) => {
-  const verifyResponse = await verifyPayment(transactionId);
+const confirmationService = async (transactionId: string) => {
+  let isSuccess = false;
 
-  let message;
-  if (verifyResponse && verifyResponse?.pay_status === 'Successful') {
-    await Booking.findOneAndUpdate(
-      { transactionId },
-      {
-        paymentStatus: 'paid',
-        isBooked: 'confirmed',
-      },
-    );
-    message = 'Successfully Paid!';
-  } else {
-    message = 'Payment Failed!';
+  try {
+    const verifyResponse = await verifyPayment(transactionId);
+
+    if (verifyResponse && verifyResponse?.pay_status === 'Successful') {
+      await Booking.findOneAndUpdate(
+        { transactionId },
+        {
+          paymentStatus: 'paid',
+          isBooked: 'confirmed',
+        },
+      );
+      isSuccess = true;
+    }
+  } catch (error) {
+    isSuccess = false;
   }
 
-  const filePath = join(__dirname, '../../views/confirmation.html');
-  let template = readFileSync(filePath, 'utf-8');
+  const clientUrl = config.client_base_url;
+  const redirectUrl = isSuccess
+    ? `${clientUrl}/payment-status?transactionId=${transactionId}&status=success`
+    : `${clientUrl}/payment-status?transactionId=${transactionId}&status=failed`;
 
-  template = template.replace('{{message}}', message);
+  return redirectUrl;
+};
 
-  return template;
+const getPaymentDetailsFromDB = async (transactionId: string) => {
+  const booking = await Booking.findOne({ transactionId })
+    .populate('facility')
+    .populate('user');
+  return booking;
 };
 
 export const PaymentService = {
-  controllerService,
+  confirmationService,
+  getPaymentDetailsFromDB,
 };

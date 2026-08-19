@@ -18,4 +18,6 @@ export default {
   signature_key: process.env.SIGNATURE_KEY,
   payment_url: process.env.PAYMENT_URL,
   verify_payment_url: process.env.VERIFY_PAYMENT_URL,
+  backend_base_url: process.env.BACKEND_BASE_URL || 'http://localhost:5000',
+  client_base_url: process.env.CLIENT_BASE_URL || 'http://localhost:5173',
 };

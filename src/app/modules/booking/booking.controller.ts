@@ -51,8 +51,7 @@ const getSingleBooking = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Academic semester is retrieved succesfully',
-
+    message: 'Booking retrieved successfully',
     data: result,
   });
 });

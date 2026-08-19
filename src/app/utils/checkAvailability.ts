@@ -13,13 +13,15 @@ const checkAvailability = catchAsync(async (req, res) => {
 
   const dateQuery = req?.query?.date as string;
   const facilityQuery = req?.query?.facility;
-  const date = dateQuery ? new Date(dateQuery) : new Date();
-  const formattedDate = date.toISOString().split('T')[0];
+  const formattedDate = dateQuery
+    ? dateQuery
+    : new Date().toISOString().split('T')[0];
 
-  // Retrieve bookings for the specified date and sort by start time in ascending order
+  // Retrieve non-canceled bookings for the specified date and sort by start time in ascending order
   const bookings = await Booking.find({
     date: formattedDate,
     facility: facilityQuery,
+    isBooked: { $ne: 'canceled' },
   })
     .sort('startTime')
     .sort('endTime');
