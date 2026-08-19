@@ -10,6 +10,7 @@
     "lint:fix": "npx eslint src --fix",
     "prettier": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",
     "prettier:fix": "npx prettier --write src",
+    "seed": "ts-node-dev --transpile-only ./src/app/db/seed.ts",
     "test": "jest"
   },
   "keywords": [
