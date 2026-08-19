@@ -4,5 +4,9 @@ export type TFacility = {
   pricePerHour: number;
   location: string;
   image?: string;
+  category?: string;
+  amenities?: string[];
+  rating?: number;
+  reviewsCount?: number;
   isDeleted?: boolean;
 };
